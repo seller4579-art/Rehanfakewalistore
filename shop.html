@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0A1F12">
+    <title>CARD VAULT — Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0A1F12;
+            --primary-green: #10B981;
+            --emerald-green: #059669;
+            --gold-accent: #D4AF37;
+            --gold-soft: #C9A227;
+            --neon-mint: #6EE7B7;
+            --text-main: #ECFDF5;
+            --text-muted: #A7C4B5;
+            --glass-border: rgba(212, 175, 55, 0.28);
+            --glass-border-soft: rgba(16, 185, 129, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.modal-open {
+            overflow: hidden !important;
+            position: fixed !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background-image: 
+                linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: rotateX(60deg);
+            animation: gridMove 24s linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes gridMove {
+            0% { transform: translateY(0) rotateX(45deg); }
+            100% { transform: translateY(50px) rotateX(45deg); }
+        }
+
+        .bg-glows {
+            position: fixed;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .glow-1 {
+            position: absolute;
+            top: -20%; left: -20%;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatGlow 10s ease-in-out infinite alternate;
+        }
+        .glow-2 {
+            position: absolute;
+            bottom: -20%; right: -20%;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatGlow 12s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 50px) scale(1.2); }
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 10;
+            padding: 16px 14px 60px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 22px;
+        }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 22px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+        }
+        .logo span { color: var(--gold-accent); }
+
+        .profile-icon {
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(212,175,55,0.08));
+            border: 1px solid var(--glass-border);
+            padding: 11px 13px;
+            border-radius: 50%;
+            color: var(--gold-accent);
+            font-size: 15px;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.15);
+            cursor: pointer;
+        }
+
+        .status-box {
+            background: rgba(18, 40, 28, 0.78);
+            border: 1px solid var(--glass-border-soft);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+        }
+        .status-left { display: flex; align-items: center; gap: 12px; }
+        .vx-badge {
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            padding: 10px 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            color: #0A1F12;
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.45);
+        }
+        .uid-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .uid-info p {
+            font-size: 10px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+        .node-tag {
+            color: var(--gold-accent);
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: rgba(18, 40, 28, 0.78);
+            border-radius: 14px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--glass-border-soft);
+        }
+        .stat-card p {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .stat-card .val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            margin-top: 8px;
+            color: var(--primary-green);
+            text-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            background: rgba(10, 31, 18, 0.85);
+            color: var(--text-muted);
+            padding: 9px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 11px;
+            font-family: 'Orbitron', sans-serif;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            color: #0A1F12;
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+        }
+
+        .market-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .cc-item {
+            background: rgba(18, 40, 28, 0.78);
+            border-radius: 22px;
+            border: 1px solid var(--glass-border-soft);
+            padding: 16px;
+            backdrop-filter: blur(28px);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+        }
+
+        .visual-card {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1.586 / 1;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #0F2A1A 0%, #061008 40%, #143520 100%);
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(212,175,55,0.1);
+            margin-bottom: 15px;
+        }
+
+        .vc-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 17.5px;
+            letter-spacing: 3px;
+            color: #F0FDF4;
+            padding: 6px 18px 3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.75);
+        }
+
+        .vc-chip {
+            width: 46px; height: 34px;
+            background: linear-gradient(145deg, #F0D590, #D4AF37, #A67C00);
+            border-radius: 7px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.5);
+        }
+
+        .buy-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            color: #0A1F12;
+            border: none;
+            padding: 13px;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0A1F12;
+            z-index: 999999;
+            display: none;
+            flex-direction: column;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .pay-page {
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #0A1F12 0%, #0F2A1A 50%, #061008 100%);
+            overflow-y: auto;
+        }
+
+        .pay-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            background: rgba(10, 31, 18, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .pay-back {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            color: var(--gold-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .pay-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        .pay-title span { color: var(--gold-accent); }
+
+        .pay-body {
+            flex: 1;
+            padding: 28px 20px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .pay-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .pay-amount .rupee {
+            font-size: 26px;
+            color: var(--gold-accent);
+            margin-top: 8px;
+            margin-right: 2px;
+        }
+
+        .qr-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 22px;
+            width: 100%;
+        }
+        .qr-box p {
+            font-size: 11px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            padding: 14px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(212,175,55,0.08), rgba(16,185,129,0.05));
+            border: 1.5px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 238px;
+            min-height: 238px;
+        }
+
+        .qr-image {
+            width: 210px;
+            height: 210px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: #fff;
+            padding: 8px;
+            display: block;
+        }
+
+        .upi-box {
+            background: rgba(0,0,0,0.4);
+            width: 100%;
+            padding: 15px 18px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--gold-accent);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            margin-bottom: 24px;
+        }
+        .copy-btn {
+            color: #0A1F12;
+            background: var(--gold-accent);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 10.5px;
+            cursor: pointer;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 28px;
+            width: 100%;
+        }
+        .app-btn {
+            background: rgba(18, 40, 28, 0.9);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 12px;
+            padding: 15px 4px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+        .app-btn i { font-size: 22px; }
+        .app-btn.phonepe i { color: #5f259f; }
+        .app-btn.gpay i { color: #ea4335; }
+        .app-btn.paytm i { color: #00baf2; }
+        .app-btn.bhim i { color: #f59e0b; }
+
+        .check-btn {
+            width: 100%;
+            padding: 17px;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-green), var(--emerald-green));
+            color: #0A1F12;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            margin-bottom: 16px;
+        }
+
+        .notice {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 12px;
+            padding: 13px;
+            font-size: 11.5px;
+            color: var(--gold-accent);
+            text-align: center;
+            line-height: 1.55;
+            width: 100%;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999999;
+            pointer-events: none;
+        }
+        .toast {
+            background: linear-gradient(135deg, var(--gold-accent), var(--gold-soft));
+            color: #0A1F12;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-15px); } }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid"></div>
+    <div class="bg-glows">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+    <canvas id="particle-canvas"></canvas>
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="app-wrapper">
+        <header>
+            <div class="logo">CARD <span>VAULT</span></div>
+            <div class="profile-icon"><i class="fa-solid fa-user"></i></div>
+        </header>
+
+        <div class="status-box">
+            <div class="status-left">
+                <div class="vx-badge">VX</div>
+                <div class="uid-info">
+                    <h3>UID-153466</h3>
+                    <p>Verified</p>
+                </div>
+            </div>
+            <div class="status-right">
+                <span class="node-tag"><i class="fa-solid fa-server"></i> GLOBAL-01</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p>Terminal Users</p>
+                <div class="val" id="dyn-users">143</div>
+            </div>
+            <div class="stat-card">
+                <p>30D Traffic</p>
+                <div class="val" id="dyn-traffic">12,450+</div>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="tab active" onclick="filterCards('ALL', this)">ALL</button>
+            <button class="tab" onclick="filterCards('VISA', this)">VISA</button>
+            <button class="tab" onclick="filterCards('MASTERCARD', this)">MASTERCARD</button>
+            <button class="tab" onclick="filterCards('RUPAY', this)">RUPAY</button>
+        </div>
+
+        <div class="market-title">Active Products</div>
+        <div class="cards-container" id="cards-container"></div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="payment-modal">
+        <div class="pay-page">
+            <div class="pay-topbar">
+                <div class="pay-back" onclick="closeGate()"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="pay-title">CARD <span>VAULT</span></div>
+                <div style="color:var(--primary-green);font-size:10px;font-family:Orbitron;font-weight:700;"><i class="fa-solid fa-shield-halved"></i> SECURE</div>
+            </div>
+
+            <div id="gateway-view" class="pay-body">
+                <div class="pay-amount"><span class="rupee">₹</span><span id="modal-price-num">150</span></div>
+                <div style="width:100%;display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:26px;border:1px solid rgba(212,175,55,0.2);padding:15px 18px;border-radius:12px;background:rgba(10,31,18,0.4);">
+                    <div>Balance: <strong id="modal-card-bal" style="color:var(--gold-accent);">₹5,000</strong></div>
+                    <div>Order: <strong id="modal-order-id" style="color:var(--gold-accent);">ORD399677</strong></div>
+                </div>
+
+                <div class="qr-box">
+                    <p>Scan & Pay via UPI</p>
+                    <div class="qr-wrapper">
+                        <img 
+                            id="upi-qr-image"
+                            class="qr-image"
+                            src="https://i.postimg.cc/PJQPvfZY/IMG-20261119-184319-562.jpg" 
+                            alt="UPI QR Code"
+                        >
+                    </div>
+                </div>
+
+                <div class="upi-box">
+                    <span id="vpa-string">6367219528-v018-2@ybl</span>
+                    <button class="copy-btn" onclick="copyVpa(this)">Copy</button>
+                </div>
+
+                <div style="text-align:center;font-size:10.5px;font-family:Orbitron;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px;letter-spacing:2px;width:100%;font-weight:700;">Or Open Application</div>
+                <div class="apps-grid">
+                    <a href="#" class="app-btn phonepe" id="link-phonepe"><i class="fa-solid fa-wallet"></i>PhonePe</a>
+                    <a href="#" class="app-btn gpay" id="link-gpay"><i class="fa-solid fa-bolt"></i>GPay</a>
+                    <a href="#" class="app-btn paytm" id="link-paytm"><i class="fa-solid fa-money-bill-wave"></i>Paytm</a>
+                    <a href="#" class="app-btn bhim" id="link-bhim"><i class="fa-solid fa-building-columns"></i>BHIM</a>
+                </div>
+
+                <button class="check-btn" onclick="startVerification()">CHECK PAYMENT</button>
+                <div class="notice">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>After payment, contact admin with Order ID to receive card credentials.</span>
+                </div>
+            </div>
+
+            <div id="processing-view" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;min-height:70vh;">
+                <div style="font-size:54px;color:var(--primary-green);animation:spin 1s linear infinite;margin-bottom:24px;"><i class="fa-solid fa-circle-notch"></i></div>
+                <h4 style="font-family:'Orbitron',sans-serif;font-size:20px;margin-bottom:12px;">Verifying Payment</h4>
+                <p style="font-size:13.5px;color:var(--text-muted);">Connecting to secure node registry...</p>
+            </div>
+
+            <div id="failed-view" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;min-height:70vh;">
+                <div style="font-size:62px;color:#ef4444;margin-bottom:22px;"><i class="fa-solid fa-circle-xmark"></i></div>
+                <h4 style="font-family:'Orbitron',sans-serif;font-size:20px;margin-bottom:12px;color:#ef4444;">Payment Not Found</h4>
+                <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:30px;">Contact support with your Order ID.</p>
+                <button onclick="closeGate()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;width:100%;max-width:300px;padding:15px;border-radius:12px;font-family:'Orbitron',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Return To Shop</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const YOUR_UPI_ID = "6367219528-v018-2@ybl";
+        const MERCHANT_NAME = "CardVault";
+
+        function showToast(msg) {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        document.getElementById('dyn-users').innerText = Math.floor(120 + Math.random() * 100);
+        document.getElementById('dyn-traffic').innerText = (11000 + Math.floor(Math.random() * 4000)).toLocaleString('en-IN') + "+";
+
+        const cardContainer = document.getElementById('cards-container');
+        
+        // ✅ 15 ALAG-ALAG PRICE & BALANCE COMBINATIONS
+        const cardData = [
+            { price: 150, balance: 5000 },
+            { price: 200, balance: 8000 },
+            { price: 250, balance: 12000 },
+            { price: 300, balance: 15000 },
+            { price: 350, balance: 18000 },
+            { price: 400, balance: 21000 },
+            { price: 450, balance: 24000 },
+            { price: 500, balance: 27000 },
+            { price: 550, balance: 30000 },
+            { price: 600, balance: 35000 },
+            { price: 700, balance: 40000 },
+            { price: 800, balance: 50000 },
+            { price: 900, balance: 65000 },
+            { price: 1000, balance: 80000 },
+            { price: 1200, balance: 100000 }
+        ];
+
+        const cardTypes = ['VISA', 'MASTERCARD', 'RUPAY'];
+        const bankNames = ['HDFC PREMIUM', 'AXIS BURGUNDY', 'SBI ELITE', 'ICICI WEALTH'];
+        const holderNames = ['SHIVAM KUMAR','ROHIT SHARMA','AMAN KUSHWAHA','AARAV MEHTA','VIVEK PATEL','DEEPAK MISHRA'];
+
+        let html = '';
+        
+        // Loop through all 15 unique tiers
+        cardData.forEach((data, i) => {
+            const price = data.price;
+            const balance = data.balance;
+            
+            const type = cardTypes[i % 3];
+            const bank = bankNames[i % 4];
+            const holder = holderNames[i % 6];
+            const exp = `${String(Math.floor(1 + Math.random() * 12)).padStart(2, '0')}/${Math.floor(28 + Math.random() * 5)}`;
+            const num = `${Math.floor(4000 + Math.random() * 1999)} ${Math.floor(5000 + Math.random() * 4000)} ${Math.floor(2000 + Math.random() * 7000)} ****`;
+
+            let logo = '';
+            if (type === 'MASTERCARD') {
+                logo = `<div style="display:flex;align-items:center;"><div style="width:24px;height:24px;border-radius:50%;background:#eb001b;"></div><div style="width:24px;height:24px;border-radius:50%;background:#f79e1b;margin-left:-9px;"></div></div>`;
+            } else if (type === 'VISA') {
+                logo = `<span style="font-family:Arial;font-size:20px;font-weight:900;font-style:italic;color:#fff;">VISA</span>`;
+            } else {
+                logo = `<span style="font-family:Arial;font-size:14px;font-weight:800;color:#fff;">Ru<span style="color:#f7941d;">Pay</span></span>`;
+            }
+
+            html += `
+                <div class="cc-item" data-brand="${type}">
+                    <div class="visual-card">
+                        <div style="display:flex;justify-content:space-between;padding:15px 18px 0;">
+                            <div style="display:flex;align-items:center;gap:7px;font-family:'Orbitron';font-size:13px;font-weight:700;color:#f0f5f0;">USD</div>
+                            <div style="font-family:Georgia;font-style:italic;font-size:16px;color:var(--gold-accent);">premium</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:14px;padding:12px 18px 8px;">
+                            <div class="vc-chip"></div>
+                        </div>
+                        <div class="vc-number">${num}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:8px 18px 14px;">
+                            <div>
+                                <div style="font-size:7.5px;color:rgba(255,255,255,0.5);text-transform:uppercase;font-family:'Orbitron';">MONTH/YEAR</div>
+                                <div style="font-family:'Orbitron';font-size:12px;color:#f0f0f0;">${exp}</div>
+                                <div style="font-family:'Orbitron';font-size:11px;color:#eaeaea;letter-spacing:1.5px;margin-top:5px;">${holder}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-family:'Orbitron';font-size:9px;color:rgba(255,255,255,0.72);margin-bottom:5px;">DEBIT CARD</div>
+                                ${logo}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="background:var(--primary-green);font-family:'Orbitron';font-size:10px;font-weight:800;padding:5px 11px;border-radius:8px;color:#0A1F12;">${type}</span>
+                        <span style="font-family:'Orbitron';font-size:10.5px;color:var(--text-muted);font-weight:700;">${bank}</span>
+                    </div>
+                    <div style="font-family:'Orbitron';font-size:15px;color:var(--primary-green);font-weight:800;margin-bottom:12px;">BAL: ₹${balance.toLocaleString('en-IN')}</div>
+                    <button class="buy-btn" onclick="triggerPayment(${price}, ${balance})">BUY NOW | ₹${price}</button>
+                </div>
+            `;
+        });
+        cardContainer.innerHTML = html;
+
+        function filterCards(cat, el) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.cc-item').forEach(c => {
+                c.style.display = (cat === 'ALL' || c.dataset.brand === cat) ? 'block' : 'none';
+            });
+        }
+
+        function triggerPayment(price, balance) {
+            document.getElementById('modal-price-num').innerText = price;
+            document.getElementById('modal-card-bal').innerText = '₹' + balance.toLocaleString('en-IN');
+            
+            const oid = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('modal-order-id').innerText = oid;
+
+            // Dynamic UPI String
+            const upi = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${price}&cu=INR&tn=${encodeURIComponent(oid)}`;
+
+            document.getElementById('link-phonepe').href = upi;
+            document.getElementById('link-gpay').href = upi;
+            document.getElementById('link-paytm').href = upi;
+            document.getElementById('link-bhim').href = upi;
+
+            document.getElementById('gateway-view').style.display = 'flex';
+            document.getElementById('processing-view').style.display = 'none';
+            document.getElementById('failed-view').style.display = 'none';
+
+            document.body.classList.add('modal-open');
+            document.getElementById('payment-modal').classList.add('active');
+            document.querySelector('.pay-page').scrollTop = 0;
+        }
+
+        function closeGate() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('payment-modal').classList.remove('active');
+        }
+
+        function copyVpa(btn) {
+            const done = () => {
+                btn.innerText = 'Copied!';
+                showToast('UPI ID Copied');
+                setTimeout(() => btn.innerText = 'Copy', 1500);
+            };
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(YOUR_UPI_ID).then(done).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = YOUR_UPI_ID;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    done();
+                });
+            } else { done(); }
+        }
+
+        function startVerification() {
+            document.getElementById('gateway-view').style.display = 'none';
+            document.getElementById('processing-view').style.display = 'flex';
+            document.getElementById('failed-view').style.display = 'none';
+            setTimeout(() => {
+                document.getElementById('processing-view').style.display = 'none';
+                document.getElementById('failed-view').style.display = 'flex';
+            }, 4500);
+        }
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            particles = [];
+            for (let i = 0; i < Math.floor((canvas.width * canvas.height) / 22000); i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    s: Math.random() * 2 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5
+                });
+            }
+        }
+        window.addEventListener('resize', resize);
+
+        function anim() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.y > canvas.height) p.y = 0;
+                if (p.y < 0) p.y = canvas.height;
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.5)';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(anim);
+        }
+
+        resize();
+        anim();
+    </script>
+</body>
+</html>
